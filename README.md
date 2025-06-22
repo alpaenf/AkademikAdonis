@@ -41,11 +41,9 @@ Aplikasi web menggunakan framework AdonisJS untuk membuat sistem manajemen user 
 * `create_user.edge`: View untuk membuat user baru 👥
 * `users.edge`: View untuk mengelola user 📊
 
-## License 📜
+UNSOED License 🎉
 
-MIT License 🎉
-
-Copyright (c) 2023 [Nama Anda] 👋
+Copyright (c) 2023 Mukhammad Alfaen Fadillah
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
