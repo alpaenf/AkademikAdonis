@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Akademik</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" crossorigin="anonymous"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif !important;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ECDFCC;
+      color: #3C3D37;
+      min-height: 100vh;
+    }
+
+    /* Sidebar - Consistent with mahasiswa page */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 72px;
+      background: #3C3D37;
+      padding: 18px 0;
+      z-index: 1000;
+      transition: width 0.2s;
+    }
+    .sidebar.expanded {
+      width: 220px;
+    }
+    .toggle-btn {
+      color: #ECDFCC;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      margin-left: 16px;
+      cursor: pointer;
+    }
+    .nav-link {
+      color: #ECDFCC;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: #697565;
+      color: #ECDFCC;
+      transform: translateX(5px);
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover i, .nav-link.active i {
+      color: #ECDFCC;
+    }
+    .nav-link i {
+      min-width: 24px;
+      text-align: center;
+    }
+    .nav-text {
+      margin-left: 16px;
+      display: none;
+    }
+    .sidebar.expanded .nav-text {
+      display: inline;
+    }
+    .main-content {
+      margin-left: 90px;
+      padding: 24px;
+      transition: margin-left 0.2s;
+    }
+    .sidebar.expanded ~ .main-content {
+      margin-left: 240px;
+    }
+
+    /* New Dashboard Design - Timeline Concept */
+    .welcome-banner {
+      background: linear-gradient(135deg, #3C3D37 0%, #4a4b45 100%);
+      color: #ECDFCC;
+      padding: 40px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .welcome-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Quick Stats Row */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .quick-stat {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(60, 61, 55, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quick-stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #697565, #3C3D37);
+    }
+
+    .quick-stat:nth-child(2)::before {
+      background: linear-gradient(90deg, #697565, #3C3D37);
+    }
+
+    .quick-stat:nth-child(3)::before {
+      background: linear-gradient(90deg, #697565, #3C3D37);
+    }
+
+    .quick-stat:nth-child(4)::before {
+      background: linear-gradient(90deg, #697565, #3C3D37);
+    }
+
+    .quick-stat:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(60, 61, 55, 0.15);
+      background: #3C3D37;
+    }
+
+    .quick-stat:hover .quick-stat-icon {
+      color: #ECDFCC;
+    }
+
+    .quick-stat:hover .quick-stat-number {
+      color: #ECDFCC;
+    }
+
+    .quick-stat:hover .quick-stat-label {
+      color: #ECDFCC;
+      opacity: 0.8;
+    }
+
+    .quick-stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      color: #3C3D37;
+    }
+
+    .quick-stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #3C3D37;
+      margin-bottom: 5px;
+    }
+
+    .quick-stat-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    /* Timeline Section */
+    .timeline-section {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(60, 61, 55, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #3C3D37, #4a4b45);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ECDFCC;
+      font-size: 1.5rem;
+      margin-right: 15px;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #3C3D37;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #667eea, #764ba2);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 25px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -22px;
+      top: 25px;
+      width: 12px;
+      height: 12px;
+      background: #667eea;
+      border-radius: 50%;
+      border: 3px solid white;
+    }
+
+    .timeline-item:nth-child(2) {
+      border-left-color: #f093fb;
+    }
+
+    .timeline-item:nth-child(2)::before {
+      background: #f093fb;
+    }
+
+    .timeline-item:nth-child(3) {
+      border-left-color: #4facfe;
+    }
+
+    .timeline-item:nth-child(3)::before {
+      background: #4facfe;
+    }
+
+    .timeline-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-icon {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      color: #3C3D37;
+      font-size: 1.2rem;
+    }
+
+    .timeline-text {
+      flex: 1;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      color: #3C3D37;
+      margin-bottom: 5px;
+    }
+
+    .timeline-time {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    /* Action Cards */
+    .action-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .action-card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(60, 61, 55, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(60, 61, 55, 0.15);
+      background: #3C3D37;
+    }
+
+    .action-card:hover .action-icon {
+      background: #ECDFCC;
+      color: #3C3D37;
+    }
+
+    .action-card:hover .action-title {
+      color: #ECDFCC;
+    }
+
+    .action-card:hover .action-desc {
+      color: #ECDFCC;
+      opacity: 0.8;
+    }
+
+    .action-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #3C3D37, #4a4b45);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      color: #ECDFCC;
+      font-size: 1.5rem;
+    }
+
+    .action-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #3C3D37;
+      margin-bottom: 10px;
+    }
+
+    .action-desc {
+      font-size: 0.9rem;
+      color: #6c757d;
+      line-height: 1.5;
+    }
+
+    /* Faculty Gallery Section */
+    .faculty-gallery-section {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(60, 61, 55, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .faculty-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .faculty-gallery-item {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(60, 61, 55, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 3px solid #e9ecef;
+    }
+
+    .faculty-gallery-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      border-color: #697565;
+    }
+
+    .faculty-gallery-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      font-size: 2.5rem;
+    }
+
+    .faculty-gallery-content {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .faculty-gallery-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #3C3D37;
+      margin-bottom: 5px;
+    }
+
+    .faculty-gallery-desc {
+      font-size: 0.8rem;
+      color: #6c757d;
+      line-height: 1.4;
+    }
+
+    .no-faculties {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .no-faculties i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: 60px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+      }
+      .toggle-btn {
+        margin: 0 16px;
+      }
+      .nav-link {
+        display: none;
+      }
+      .sidebar.expanded {
+        height: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 0;
+      }
+      .sidebar.expanded .nav-link {
+        display: flex;
+      }
+      .main-content {
+        margin-left: 0;
+        margin-top: 80px;
+      }
+      .quick-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .action-cards {
+        grid-template-columns: 1fr;
+      }
+      .welcome-title {
+        font-size: 2rem;
+      }
+    }
+
+    .table tbody tr:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC;
+      transform: scale(1.01);
+      transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover td {
+      color: #ECDFCC;
+    }
+
+    .table tbody tr:hover .badge {
+      background: #ECDFCC !important;
+      color: #3C3D37 !important;
+    }
+
+    /* Enhanced Button Hover Effects */
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(60, 61, 55, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    .btn-primary:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    .btn-warning:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    .btn-info:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" id="sidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <a href="/dashboard" class="nav-link active"><i class="fa-solid fa-house"></i><span class="nav-text">Dashboard</span></a>
+    <a href="/dashboard/mahasiswa" class="nav-link"><i class="fa-solid fa-user-graduate"></i><span class="nav-text">Mahasiswa</span></a>
+    <a href="/dashboard/krs" class="nav-link"><i class="fa-solid fa-book-open"></i><span class="nav-text">KRS</span></a>
+    <a href="/dashboard/matakuliah" class="nav-link"><i class="fa-solid fa-book"></i><span class="nav-text">Mata Kuliah</span></a>
+    <a href="/dashboard/prodi" class="nav-link"><i class="fa-solid fa-graduation-cap"></i><span class="nav-text">Prodi</span></a>
+    <a href="/dashboard/fakultas" class="nav-link"><i class="fa-solid fa-building"></i><span class="nav-text">Fakultas</span></a>
+    <a href="/dashboard/profile" class="nav-link"><i class="fa-solid fa-user"></i><span class="nav-text">Profile</span></a>
+    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link">
+      <i class="fa-solid fa-right-from-bracket"></i><span class="nav-text">Logout</span>
+    </a>
+  </nav>
+
+  <div class="main-content" id="mainContent">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <h1 class="welcome-title">Selamat Datang!</h1>
+      <p class="welcome-subtitle">Sistem Manajemen Akademik Universitas</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="quick-stat" id="studentsStat">
+        <div class="quick-stat-icon">
+          <i class="fa-solid fa-user-graduate"></i>
+        </div>
+        <div class="quick-stat-number" id="studentsCount">{{ totalMahasiswa || 0 }}</div>
+        <div class="quick-stat-label">Mahasiswa</div>
+      </div>
+
+      <div class="quick-stat" id="programsStat">
+        <div class="quick-stat-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="quick-stat-number" id="programsCount">{{ totalProdi || 0 }}</div>
+        <div class="quick-stat-label">Program Studi</div>
+      </div>
+
+      <div class="quick-stat" id="facultiesStat">
+        <div class="quick-stat-icon">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div class="quick-stat-number" id="facultiesCount">{{ totalFakultas || 0 }}</div>
+        <div class="quick-stat-label">Fakultas</div>
+      </div>
+
+      <div class="quick-stat" id="coursesStat">
+        <div class="quick-stat-icon">
+          <i class="fa-solid fa-book"></i>
+        </div>
+        <div class="quick-stat-number" id="coursesCount">{{ totalMatakuliah || 0 }}</div>
+        <div class="quick-stat-label">Mata Kuliah</div>
+      </div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <div class="action-card" onclick="window.location.href='/dashboard/mahasiswa'">
+        <div class="action-icon">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div class="action-title">Kelola Mahasiswa</div>
+        <div class="action-desc">Tambah, edit, dan kelola data mahasiswa</div>
+      </div>
+
+      <div class="action-card" onclick="window.location.href='/dashboard/matakuliah'">
+        <div class="action-icon">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div class="action-title">Kelola Mata Kuliah</div>
+        <div class="action-desc">Atur mata kuliah dan jadwal perkuliahan</div>
+      </div>
+
+      <div class="action-card" onclick="window.location.href='/dashboard/krs'">
+        <div class="action-icon">
+          <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="action-title">Sistem KRS</div>
+        <div class="action-desc">Kelola Kartu Rencana Studi mahasiswa</div>
+      </div>
+
+      <div class="action-card" onclick="window.location.href='/dashboard/prodi'">
+        <div class="action-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="action-title">Program Studi</div>
+        <div class="action-desc">Kelola program studi dan kurikulum</div>
+      </div>
+    </div>
+
+
+    <!-- Timeline Section -->
+    <div class="timeline-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="section-title">Aktivitas Terbaru</div>
+      </div>
+
+      <div class="timeline" id="activityTimeline">
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <div class="timeline-text">
+              <div class="timeline-title">Mahasiswa Baru Terdaftar</div>
+              <div class="timeline-time">Ahmad Fadillah - 2 menit yang lalu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <div class="timeline-text">
+              <div class="timeline-title">Mata Kuliah Baru Ditambahkan</div>
+              <div class="timeline-time">Pemrograman Web - 15 menit yang lalu</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-content">
+            <div class="timeline-icon">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="timeline-text">
+              <div class="timeline-title">Program Studi Diperbarui</div>
+              <div class="timeline-time">Teknik Informatika - 1 jam yang lalu</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form id="logout-form" action="/logout" method="POST" style="display: none;">
+    @csrf
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sidebar Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      sidebar.classList.toggle('expanded');
+      mainContent.classList.toggle('expanded');
+      
+      // Save state to localStorage
+      localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
+    }
+
+    // Load sidebar state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      
+      if (sidebarExpanded) {
+        sidebar.classList.add('expanded');
+        mainContent.classList.add('expanded');
+      }
+    });
+
+    // Realtime Updates
+    async function updateStats() {
+      try {
+        const res = await fetch('/api/dashboard-stats');
+        const data = await res.json();
+        document.getElementById('studentsCount').textContent = data.totalMahasiswa;
+        document.getElementById('programsCount').textContent = data.totalProdi;
+        document.getElementById('facultiesCount').textContent = data.totalFakultas;
+        document.getElementById('coursesCount').textContent = data.totalMatakuliah;
+      } catch (e) {
+        // Optionally show error
+      }
+    }
+    setInterval(updateStats, 10000);
+    document.addEventListener('DOMContentLoaded', updateStats);
+
+    // Add new timeline item
+    function addTimelineItem(title, time, icon) {
+      const timeline = document.getElementById('activityTimeline');
+      const newItem = document.createElement('div');
+      newItem.className = 'timeline-item';
+      newItem.style.opacity = '0';
+      newItem.style.transform = 'translateX(-20px)';
+      
+      newItem.innerHTML = `
+        <div class="timeline-content">
+          <div class="timeline-icon">
+            <i class="${icon}"></i>
+          </div>
+          <div class="timeline-text">
+            <div class="timeline-title">${title}</div>
+            <div class="timeline-time">${time}</div>
+          </div>
+        </div>
+      `;
+      
+      timeline.insertBefore(newItem, timeline.firstChild);
+      
+      // Animate in
+      setTimeout(() => {
+        newItem.style.transition = 'all 0.3s ease';
+        newItem.style.opacity = '1';
+        newItem.style.transform = 'translateX(0)';
+      }, 10);
+      
+      // Remove old items if too many
+      const items = timeline.querySelectorAll('.timeline-item');
+      if (items.length > 5) {
+        items[items.length - 1].remove();
+      }
+    }
+
+    // Simulate realtime activity updates
+    function simulateActivity() {
+      const activities = [
+        { title: 'Mahasiswa Baru Terdaftar', time: 'Sarah Putri - Baru saja', icon: 'fa-solid fa-user-plus' },
+        { title: 'Mata Kuliah Baru Ditambahkan', time: 'Database Management - 1 menit yang lalu', icon: 'fa-solid fa-book' },
+        { title: 'Program Studi Diperbarui', time: 'Sistem Informasi - 3 menit yang lalu', icon: 'fa-solid fa-graduation-cap' },
+        { title: 'Fakultas Baru Ditambahkan', time: 'Fakultas Kedokteran - 5 menit yang lalu', icon: 'fa-solid fa-building-columns' },
+        { title: 'KRS Baru Dibuat', time: 'Semester Ganjil - 10 menit yang lalu', icon: 'fa-solid fa-clipboard-list' }
+      ];
+      
+      const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+      addTimelineItem(randomActivity.title, randomActivity.time, randomActivity.icon);
+    }
+
+    // Start realtime updates
+    setInterval(simulateActivity, 20000); // Add activity every 20 seconds
+
+    // Initial update after 5 seconds
+    setTimeout(simulateActivity, 5000);
+  </script>
+</body>
+</html>

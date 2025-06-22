@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Prodi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      background-color: #ECDFCC;
+      color: #181C14;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 72px;
+      background: #3C3D37;
+      padding: 18px 0;
+      z-index: 1000;
+      transition: width 0.2s;
+    }
+    .sidebar.expanded {
+      width: 220px;
+    }
+    .toggle-btn {
+      color: #ECDFCC;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      margin-left: 16px;
+      cursor: pointer;
+    }
+    .nav-link {
+      color: #ECDFCC;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: #697565;
+      color: #ECDFCC;
+      transform: translateX(5px);
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover i, .nav-link.active i {
+      color: #ECDFCC;
+    }
+    .nav-link i {
+      min-width: 24px;
+      text-align: center;
+    }
+    .nav-text {
+      margin-left: 16px;
+      display: none;
+    }
+    .sidebar.expanded .nav-text {
+      display: inline;
+    }
+    .main-content {
+      margin-left: 90px;
+      padding: 24px;
+      transition: margin-left 0.2s;
+    }
+    .sidebar.expanded ~ .main-content {
+      margin-left: 240px;
+    }
+    .card {
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card h3 {
+      color: #3C3D37;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #697565;
+      padding-bottom: 10px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #697565, #5a6b4f);
+      color: white;
+    }
+    .btn-success:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+    .btn-secondary {
+      background: #ECDFCC;
+      color: #181C14 !important;
+      border: 1px solid #d4c5b0;
+    }
+    .btn-secondary:hover {
+      background: #d4c5b0;
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+    }
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #c82333, #bd2130);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn-warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: #212529;
+      border: none;
+    }
+    .btn-warning:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+    .btn-group .btn {
+      margin-right: 4px;
+    }
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+    .form-control, .form-select {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #697565;
+      box-shadow: 0 0 0 3px rgba(105, 117, 101, 0.1);
+      outline: none;
+    }
+    .table {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .table th {
+      background: linear-gradient(135deg, #3C3D37, #2a2b26);
+      color: #ECDFCC;
+      font-weight: 600;
+      padding: 16px 12px;
+      border: none;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    .table td {
+      padding: 16px 12px;
+      border-bottom: 1px solid #f8f9fa;
+      vertical-align: middle;
+    }
+    .table tbody tr:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC;
+      transform: scale(1.01);
+      transition: all 0.3s ease;
+    }
+    .table tbody tr:hover td {
+      color: #ECDFCC;
+    }
+    .table tbody tr:hover .badge {
+      background: #ECDFCC !important;
+      color: #3C3D37 !important;
+    }
+    .badge {
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+    .btn-sm i {
+      margin-right: 6px;
+    }
+    .search-box {
+      border: 2px solid #e9ecef;
+      border-radius: 25px;
+      padding: 12px 20px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus {
+      border-color: #697565;
+      box-shadow: 0 0 0 3px rgba(105, 117, 101, 0.1);
+      outline: none;
+    }
+    /* Enhanced Button Hover Effects */
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(60, 61, 55, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    .btn-info:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <button class="toggle-btn"><i class="fas fa-bars"></i></button>
+    <a href="/dashboard" class="nav-link"><i class="fas fa-home"></i><span class="nav-text">Dashboard</span></a>
+    <a href="/dashboard/mahasiswa" class="nav-link"><i class="fas fa-user-graduate"></i><span class="nav-text">Mahasiswa</span></a>
+    <a href="/dashboard/krs" class="nav-link"><i class="fas fa-book-open"></i><span class="nav-text">KRS</span></a>
+    <a href="/dashboard/matakuliah" class="nav-link"><i class="fas fa-book"></i><span class="nav-text">Mata Kuliah</span></a>
+    <a href="/dashboard/prodi" class="nav-link active"><i class="fas fa-graduation-cap"></i><span class="nav-text">Prodi</span></a>
+    <a href="/dashboard/fakultas" class="nav-link"><i class="fas fa-building"></i><span class="nav-text">Fakultas</span></a>
+    <a href="/dashboard/profile" class="nav-link"><i class="fas fa-user"></i><span class="nav-text">Profile</span></a>
+    <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+      <i class="fas fa-sign-out-alt"></i><span class="nav-text">Logout</span>
+    </a>
+  </nav>
+
+  <div class="main-content">
+    <div class="card">
+      <h3><i class="fas fa-plus-circle me-2"></i>Tambah Prodi</h3>
+      <form method="POST" action="/dashboard/prodi">
+        <input type="hidden" name="_token" value="{{ csrfToken }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Nama Prodi</label>
+            <input type="text" name="nama" class="form-control" placeholder="Contoh: Teknik Informatika" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Fakultas</label>
+            <select name="fakultas_id" class="form-select" required>
+              <option value="">Pilih Fakultas</option>
+              @each(f in fakultas)
+                <option value="{{ f.id }}">{{ f.nama }}</option>
+              @endeach
+            </select>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12 d-flex justify-content-end gap-3">
+            <button type="reset" class="btn btn-secondary"><i class="fas fa-undo me-1"></i>Reset</button>
+            <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i>Simpan</button>
+          </div>
+      </div>
+    </form>
+  </div>
+
+    <div class="card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fas fa-list me-2"></i>Data Prodi</h3>
+        <input type="text" class="form-control search-box" style="width: 250px;" placeholder="🔍 Cari prodi...">
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+      <thead>
+        <tr>
+              <th><i class="fas fa-hashtag me-1"></i>ID</th>
+              <th><i class="fas fa-graduation-cap me-1"></i>Nama Prodi</th>
+              <th><i class="fas fa-university me-1"></i>Fakultas</th>
+              <th><i class="fas fa-cogs me-1"></i>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        @each(prodi in data)
+        <tr>
+              <td><strong>{{ prodi.id }}</strong></td>
+          <td>{{ prodi.nama }}</td>
+              <td><span class="badge bg-primary">{{ prodi.fakultas ? prodi.fakultas.nama : '-' }}</span></td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-warning btn-sm" onclick="editProdi({{ prodi.id }}, '{{ prodi.nama }}', {{ prodi.fakultas_id || 'null' }})">
+                    <i class="fas fa-edit me-1"></i>Edit
+                  </button>
+                  <form action="/dashboard/prodi/{{ prodi.id }}/delete" method="POST" onsubmit="return confirm('Yakin ingin menghapus prodi ini?')" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrfToken }}">
+                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash me-1"></i>Hapus</button>
+            </form>
+                </div>
+          </td>
+        </tr>
+        @endeach
+      </tbody>
+    </table>
+  </div>
+</div>
+  </div>
+
+  <!-- Modal Edit Prodi -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Prodi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editForm" method="POST">
+          <div class="modal-body">
+            <input type="hidden" name="_token" value="{{ csrfToken }}">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nama Prodi</label>
+              <input type="text" name="nama" id="editNama" class="form-control" placeholder="Contoh: Teknik Informatika" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Fakultas</label>
+              <select name="fakultas_id" id="editFakultasId" class="form-select" required>
+                <option value="">Pilih Fakultas</option>
+                @each(f in fakultas)
+                  <option value="{{ f.id }}">{{ f.nama }}</option>
+                @endeach
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-warning">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <form id="logout-form" action="/logout" method="POST" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrfToken }}">
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const toggleBtn = document.querySelector('.toggle-btn');
+      
+      toggleBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('expanded');
+      });
+    });
+
+    function editProdi(id, nama, fakultasId) {
+      document.getElementById('editForm').action = `/dashboard/prodi/${id}/update`;
+      document.getElementById('editNama').value = nama;
+      document.getElementById('editFakultasId').value = fakultasId || '';
+      
+      const modal = new bootstrap.Modal(document.getElementById('editModal'));
+      modal.show();
+    }
+  </script>
+</body>
+</html>

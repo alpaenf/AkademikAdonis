@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Fakultas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      background-color: #ECDFCC;
+      color: #181C14;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 72px;
+      background: #3C3D37;
+      padding: 18px 0;
+      z-index: 1000;
+      transition: width 0.2s;
+    }
+    .sidebar.expanded {
+      width: 220px;
+    }
+    .toggle-btn {
+      color: #ECDFCC;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      margin-left: 16px;
+      cursor: pointer;
+    }
+    .nav-link {
+      color: #ECDFCC;
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      text-decoration: none;
+      border-radius: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: #697565;
+      color: #ECDFCC;
+      transform: translateX(5px);
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover i, .nav-link.active i {
+      color: #ECDFCC;
+    }
+    .nav-link i {
+      min-width: 24px;
+      text-align: center;
+    }
+    .nav-text {
+      margin-left: 16px;
+      display: none;
+    }
+    .sidebar.expanded .nav-text {
+      display: inline;
+    }
+    .main-content {
+      margin-left: 90px;
+      padding: 24px;
+      transition: margin-left 0.2s;
+    }
+    .sidebar.expanded ~ .main-content {
+      margin-left: 240px;
+    }
+    .card {
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card h3 {
+      color: #3C3D37;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #697565;
+      padding-bottom: 10px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #697565, #5a6b4f);
+      color: white;
+    }
+    .btn-success:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+    .btn-secondary {
+      background: #ECDFCC;
+      color: #181C14 !important;
+      border: 1px solid #d4c5b0;
+    }
+    .btn-secondary:hover {
+      background: #d4c5b0;
+      transform: translateY(-2px);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+    }
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #c82333, #bd2130);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn-warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: #212529;
+      border: none;
+    }
+    .btn-warning:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+    .btn-group .btn {
+      margin-right: 4px;
+    }
+    .btn-group .btn:last-child {
+      margin-right: 0;
+    }
+    .form-control, .form-select {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: #697565;
+      box-shadow: 0 0 0 3px rgba(105, 117, 101, 0.1);
+      outline: none;
+    }
+    .search-box {
+      border: 2px solid #e9ecef;
+      border-radius: 25px;
+      padding: 12px 20px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+    .search-box:focus {
+      border-color: #697565;
+      box-shadow: 0 0 0 3px rgba(105, 117, 101, 0.1);
+      outline: none;
+    }
+    .form-select {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background-color: white;
+    }
+    .form-select:focus {
+      border-color: #697565;
+      box-shadow: 0 0 0 3px rgba(105, 117, 101, 0.1);
+      outline: none;
+    }
+    .gap-3 {
+      gap: 1rem !important;
+    }
+    .alert {
+      border: none;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .alert-success {
+      background: linear-gradient(135deg, #d4edda, #c3e6cb);
+      color: #155724;
+      border-left: 4px solid #28a745;
+    }
+    .alert-danger {
+      background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+      color: #721c24;
+      border-left: 4px solid #dc3545;
+    }
+    .btn-close {
+      filter: invert(1);
+    }
+    /* Enhanced Button Hover Effects */
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(60, 61, 55, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    .btn-info:hover {
+      background: #3C3D37 !important;
+      color: #ECDFCC !important;
+      border-color: #3C3D37 !important;
+    }
+
+    /* Faculty Card Styles */
+    .faculty-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+      border: 3px solid #e9ecef;
+    }
+    
+    .faculty-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-color: #697565;
+    }
+    
+    .faculty-card:active {
+      transform: translateY(-4px) scale(0.98);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      background: linear-gradient(135deg, #697565, #5a6b4f);
+      color: #ECDFCC;
+      border-color: #ECDFCC;
+    }
+    
+    .faculty-card:active .faculty-title {
+      color: #ECDFCC !important;
+    }
+    
+    .faculty-card:active .faculty-description {
+      color: #d4c5b0 !important;
+    }
+    
+    .faculty-card.clicked {
+      background: linear-gradient(135deg, #3C3D37, #2a2b26);
+      color: #ECDFCC;
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(60, 61, 55, 0.3);
+      border-color: #ECDFCC;
+      border-width: 4px;
+    }
+    
+    .faculty-card.clicked .faculty-title {
+      color: #ECDFCC !important;
+    }
+    
+    .faculty-card.clicked .faculty-description {
+      color: #d4c5b0 !important;
+    }
+    
+    .faculty-card.clicked .faculty-image {
+      background: linear-gradient(135deg, #697565, #5a6b4f);
+    }
+    
+    .faculty-card.clicked .faculty-image i {
+      color: #ECDFCC;
+    }
+    
+    .faculty-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      font-size: 3rem;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-content {
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #3C3D37;
+      margin-bottom: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-description {
+      color: #6c757d;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 20px;
+      flex-grow: 1;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-actions .btn {
+      flex: 1;
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .faculty-card.clicked .faculty-actions .btn {
+      background: #ECDFCC !important;
+      color: #3C3D37 !important;
+      border-color: #ECDFCC !important;
+    }
+    
+    .faculty-card.clicked .faculty-actions .btn:hover {
+      background: #d4c5b0 !important;
+      color: #3C3D37 !important;
+      transform: translateY(-2px);
+    }
+    
+    .file-upload-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-upload-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-upload-label {
+      display: block;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #6c757d;
+    }
+    
+    .file-upload-label:hover {
+      border-color: #697565;
+      background: #e9ecef;
+      color: #3C3D37;
+    }
+    
+    .file-upload-label i {
+      margin-right: 8px;
+    }
+    
+    .selected-file {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <button class="toggle-btn"><i class="fas fa-bars"></i></button>
+    <a href="/dashboard" class="nav-link"><i class="fas fa-home"></i><span class="nav-text">Dashboard</span></a>
+    <a href="/dashboard/mahasiswa" class="nav-link"><i class="fas fa-user-graduate"></i><span class="nav-text">Mahasiswa</span></a>
+    <a href="/dashboard/krs" class="nav-link"><i class="fas fa-book-open"></i><span class="nav-text">KRS</span></a>
+    <a href="/dashboard/matakuliah" class="nav-link"><i class="fas fa-book"></i><span class="nav-text">Mata Kuliah</span></a>
+    <a href="/dashboard/prodi" class="nav-link"><i class="fas fa-graduation-cap"></i><span class="nav-text">Prodi</span></a>
+    <a href="/dashboard/fakultas" class="nav-link active"><i class="fas fa-building"></i><span class="nav-text">Fakultas</span></a>
+    <a href="/dashboard/profile" class="nav-link"><i class="fas fa-user"></i><span class="nav-text">Profile</span></a>
+    <a href="#" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+      <i class="fas fa-sign-out-alt"></i><span class="nav-text">Logout</span>
+    </a>
+  </nav>
+  <div class="main-content">
+    <div class="card">
+      <h3><i class="fas fa-plus-circle me-2"></i>Tambah Fakultas</h3>
+      <form method="POST" action="/dashboard/fakultas" enctype="multipart/form-data">
+        <input type="hidden" name="_token" value="{{ csrfToken }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Nama Fakultas</label>
+            <input type="text" name="nama" placeholder="Contoh: Fakultas Teknik" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Gambar Fakultas</label>
+            <div class="file-upload-wrapper">
+              <label for="gambar" class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Pilih Gambar
+              </label>
+              <input type="file" id="gambar" name="gambar" accept="image/*" onchange="updateFileName(this)">
+              <div id="selectedFileName" class="selected-file" style="display: none;"></div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label fw-bold">&nbsp;</label>
+            <button type="submit" class="btn btn-success w-100"><i class="fas fa-save me-1"></i>Tambah</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fas fa-list me-2"></i>Data Fakultas <span id="dataCounter" class="badge bg-primary ms-2">0</span></h3>
+        <div class="d-flex gap-3 align-items-center">
+          <select id="sortSelect" class="form-select" style="width: 200px;">
+            <option value="id-asc">📊 ID (A-Z)</option>
+            <option value="id-desc">📊 ID (Z-A)</option>
+            <option value="nama-asc">🏛️ Nama (A-Z)</option>
+            <option value="nama-desc">🏛️ Nama (Z-A)</option>
+          </select>
+          <input type="text" class="form-control search-box" style="width: 250px;" placeholder="🔍 Cari fakultas...">
+        </div>
+      </div>
+      <div class="row" id="facultyGrid">
+        @each(item in data)
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 faculty-item" data-id="{{ item.id }}" data-nama="{{ item.nama.toLowerCase() }}">
+          <div class="faculty-card">
+            @if(item.gambar)
+              <img src="{{ item.gambar }}" alt="{{ item.nama }}" class="faculty-image">
+            @else
+              <div class="faculty-image">
+                <i class="fas fa-university"></i>
+              </div>
+            @endif
+            <div class="faculty-content">
+              <h5 class="faculty-title">{{ item.nama }}</h5>
+              <p class="faculty-description">
+                Fakultas ini menyediakan berbagai program studi yang berkualitas tinggi 
+                dengan tenaga pengajar yang berpengalaman dan fasilitas yang memadai 
+                untuk mendukung proses pembelajaran yang optimal.
+              </p>
+              <div class="faculty-actions">
+                <button class="btn btn-warning btn-sm" onclick="editFakultas({{ item.id }}, '{{ item.nama }}', '{{ item.gambar || '' }}')">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+                <form action="/dashboard/fakultas/{{ item.id }}/delete" method="POST" onsubmit="return confirm('Yakin ingin menghapus fakultas ini?')" style="display: inline;">
+                  <input type="hidden" name="_token" value="{{ csrfToken }}">
+                  <button class="btn btn-danger btn-sm"><i class="fas fa-trash me-1"></i>Hapus</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        @endeach
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Edit Fakultas -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">Edit Fakultas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editForm" method="POST" enctype="multipart/form-data">
+          <div class="modal-body">
+            <input type="hidden" name="_token" value="{{ csrfToken }}">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Nama Fakultas</label>
+              <input type="text" name="nama" id="editNama" class="form-control" placeholder="Contoh: Fakultas Teknik" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Gambar Fakultas</label>
+              <div class="file-upload-wrapper">
+                <label for="editGambar" class="file-upload-label">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  Pilih Gambar Baru
+                </label>
+                <input type="file" id="editGambar" name="gambar" accept="image/*" onchange="updateEditFileName(this)">
+                <div id="selectedEditFileName" class="selected-file" style="display: none;"></div>
+              </div>
+              <div id="currentImage" class="mt-2" style="display: none;">
+                <small class="text-muted">Gambar saat ini:</small>
+                <img id="currentImageSrc" src="" alt="Current Image" style="max-width: 100px; max-height: 100px; border-radius: 8px; margin-top: 5px;">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-warning">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <form id="logout-form" action="/logout" method="POST" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrfToken }}">
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const toggleBtn = document.querySelector('.toggle-btn');
+      toggleBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('expanded');
+      });
+
+      // Sorting functionality
+      const sortSelect = document.getElementById('sortSelect');
+      const facultyGrid = document.getElementById('facultyGrid');
+      const searchBox = document.querySelector('.search-box');
+
+      function sortFacultyCards(sortBy) {
+        const cards = Array.from(facultyGrid.querySelectorAll('.faculty-item'));
+        const [field, direction] = sortBy.split('-');
+        
+        cards.sort((a, b) => {
+          let aValue, bValue;
+          
+          switch(field) {
+            case 'id':
+              aValue = parseInt(a.dataset.id) || 0;
+              bValue = parseInt(b.dataset.id) || 0;
+              break;
+            case 'nama':
+              aValue = a.dataset.nama;
+              bValue = b.dataset.nama;
+              break;
+            default:
+              return 0;
+          }
+          
+          if (direction === 'asc') {
+            return aValue > bValue ? 1 : -1;
+          } else {
+            return aValue < bValue ? 1 : -1;
+          }
+        });
+        
+        // Re-append sorted cards
+        cards.forEach(card => facultyGrid.appendChild(card));
+        updateDataCounter();
+      }
+
+      function updateDataCounter() {
+        const visibleCards = Array.from(facultyGrid.querySelectorAll('.faculty-item')).filter(card => 
+          card.style.display !== 'none'
+        );
+        const counter = document.getElementById('dataCounter');
+        counter.textContent = visibleCards.length;
+      }
+
+      // Sort when dropdown changes
+      sortSelect.addEventListener('change', function() {
+        sortFacultyCards(this.value);
+        // Save preference to localStorage
+        localStorage.setItem('fakultasSortPreference', this.value);
+      });
+
+      // Load saved sorting preference
+      const savedSort = localStorage.getItem('fakultasSortPreference');
+      if (savedSort) {
+        sortSelect.value = savedSort;
+        sortFacultyCards(savedSort);
+      }
+
+      // Search functionality
+      searchBox.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const cards = facultyGrid.querySelectorAll('.faculty-item');
+        
+        cards.forEach(card => {
+          const id = card.dataset.id;
+          const nama = card.dataset.nama;
+          
+          const matches = id.includes(searchTerm) || nama.includes(searchTerm);
+          
+          card.style.display = matches ? '' : 'none';
+        });
+        updateDataCounter();
+      });
+
+      // Initialize counter on page load
+      updateDataCounter();
+
+      // Add click effects to faculty cards
+      const facultyCards = document.querySelectorAll('.faculty-card');
+      facultyCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+          // Don't trigger if clicking on buttons or forms
+          if (e.target.closest('.btn') || e.target.closest('form')) {
+            return;
+          }
+          
+          // Remove clicked class from all other cards
+          facultyCards.forEach(otherCard => {
+            if (otherCard !== this) {
+              otherCard.classList.remove('clicked');
+            }
+          });
+          
+          // Toggle clicked class on current card
+          this.classList.toggle('clicked');
+        });
+      });
+    });
+
+    function updateFileName(input) {
+      const fileNameDiv = document.getElementById('selectedFileName');
+      if (input.files && input.files[0]) {
+        fileNameDiv.textContent = 'File dipilih: ' + input.files[0].name;
+        fileNameDiv.style.display = 'block';
+      } else {
+        fileNameDiv.style.display = 'none';
+      }
+    }
+
+    function updateEditFileName(input) {
+      const fileNameDiv = document.getElementById('selectedEditFileName');
+      if (input.files && input.files[0]) {
+        fileNameDiv.textContent = 'File dipilih: ' + input.files[0].name;
+        fileNameDiv.style.display = 'block';
+      } else {
+        fileNameDiv.style.display = 'none';
+      }
+    }
+
+    function editFakultas(id, nama, gambar) {
+      document.getElementById('editForm').action = `/dashboard/fakultas/${id}/update`;
+      document.getElementById('editNama').value = nama;
+      
+      const currentImageDiv = document.getElementById('currentImage');
+      const currentImageSrc = document.getElementById('currentImageSrc');
+      
+      if (gambar) {
+        currentImageSrc.src = gambar;
+        currentImageDiv.style.display = 'block';
+      } else {
+        currentImageDiv.style.display = 'none';
+      }
+      
+      const modal = new bootstrap.Modal(document.getElementById('editModal'));
+      modal.show();
+    }
+  </script>
+</body>
+</html>
